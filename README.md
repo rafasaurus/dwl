@@ -199,3 +199,13 @@ inspiration, and to the various contributors to the project, including:
 [wiki]: https://codeberg.org/dwl/dwl/wiki/Home#compatible-status-bars
 [Discord server]: https://discord.gg/jJxZnrGPWN
 [Wayland]: https://wayland.freedesktop.org/
+
+
+Rafasaurus notes, installed patches
+ipc.patch
+genericgaps.patch
+deck.patch
+pertag.patch
+simple_scratchpad-v0.7.patch
+wlr-output-power-management-unstable-v1-protocol.h
+

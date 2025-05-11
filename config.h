@@ -152,7 +152,7 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 /* commands */
 static const char *termcmd[] = { "alacritty", NULL }; /* Set your preferred Wayland terminal */
 static const char *menucmd[] = { "wmenu-run", NULL }; /* Replaced dmenu_run */
-static const char *roficmd[] = { "sh", "-c", "$HOME/.config/rofi/launcher.sh", NULL };
+static const char *launchcmd[] = { "fuzzel", NULL };
 static const char *brightup[] = { "brightnessctl", "set", "10%+", NULL };
 static const char *brightdown[] = { "brightnessctl", "set", "10%-", NULL };
 static const char *scrcmd[] = { "sh", "-c", "$HOME/.local/bin/screenshot.sh", NULL };
@@ -172,7 +172,7 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_v,          spawn,          {.v = brightup} },
 	{ MODKEY,                    XKB_KEY_c,          spawn,          {.v = brightdown} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_P,          spawn,          {.v = scrcmd} },
-	{ MODKEY,                    XKB_KEY_o,          spawn,          {.v = roficmd} },
+	{ MODKEY,                    XKB_KEY_o,          spawn,          {.v = launchcmd} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_O,          spawn,          {.v = thunarcmd} },
 	{ MODKEY,                    XKB_KEY_Return,     spawn,          {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_b,          togglebar,      {0} },

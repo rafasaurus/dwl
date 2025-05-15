@@ -110,13 +110,21 @@ static const MonitorRule monrules[] = {
 };
 
 /* keyboard */
-static const struct xkb_rule_names xkb_rules = {
+static const struct xkb_rule_names xkb_rules[] = {
 	/* can specify fields: rules, model, layout, variant, options */
 	/* example:
 	*/
-    .layout = "us,am,ru",
-    .variant = ",phonetic,phonetic",
-	.options = "grp:win_space_toggle",
+    {
+    .layout = "us",
+    },
+    {
+    .layout = "am",
+    .variant = "phonetic",
+    },
+    {
+    .layout = "ru",
+    .variant = "phonetic",
+    }
 };
 
 static const int repeat_rate = 25;
@@ -220,6 +228,9 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_period,     focusmon,       {.i = WLR_DIRECTION_RIGHT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_less,       tagmon,         {.i = WLR_DIRECTION_LEFT} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_greater,    tagmon,         {.i = WLR_DIRECTION_RIGHT} },
+	{ MODKEY,                    XKB_KEY_u,          setxkbrules,    {.i = +0} },
+	{ MODKEY,                    XKB_KEY_a,          setxkbrules,    {.i = +1} },
+	{ MODKEY,                    XKB_KEY_r,          setxkbrules,    {.i = +2} },
 	/* { MODKEY|ShiftMask,             XK_n,      togglealttag,   {0} }, // Removed: Alt tags patch */
 	/* Use dwl TAGKEYS macro format (Key, ShiftedKey, TagIndex) */
 	/* dwm TAGKEYS( XK_1, 0 ) etc. */

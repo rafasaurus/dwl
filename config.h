@@ -63,6 +63,7 @@ static const Rule rules[] = {
 	{ "Google Earth Pro",     NULL,                   1 << 4,       0,           -1 }, // Check app_id
 	{ "Barrier",              NULL,                   1 << 4,       0,           -1 }, // Check app_id
 	{ "rhythmbox",            NULL,                   0,            1,           -1 }, // Was centered=1
+	{ "pavucontrol",          NULL,                   0,            1,           -1 }, // Was centered=1
 	{ "QtPass",               NULL,                   0,            1,           -1 }, // Was centered=1
 	{ "Rhythmbox",            NULL,                   0,            1,           -1 }, // Was centered=1
 	{ "Pcmanfm",              NULL,                   0,            1,           -1 }, // Was centered=1
@@ -175,6 +176,8 @@ static const Key keys[] = {
 	/* modifier                  key                 function        argument */
     { 0,                         XKB_KEY_XF86AudioRaiseVolume,          spawn, {.v = volumeup} },
     { 0,                         XKB_KEY_XF86AudioLowerVolume,          spawn, {.v = volumedown} },
+    { MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT,                         XKB_KEY_U,          spawn, {.v = volumeup} },
+    { MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT,                         XKB_KEY_D,          spawn, {.v = volumedown} },
     { 0,                         XKB_KEY_XF86AudioMute,                 spawn, {.v = volumetoggle} },
 	{ MODKEY,                    XKB_KEY_p,          spawn,          {.v = menucmd} },
 	{ MODKEY,                    XKB_KEY_v,          spawn,          {.v = brightup} },
@@ -219,7 +222,7 @@ static const Key keys[] = {
 	/* { MODKEY,                       XK_y,      setlayout,      {.v = &layouts[6]} }, // spiral */
 	/* { MODKEY|ShiftMask,             XK_y,      setlayout,      {.v = &layouts[7]} }, // dwindle */
 	/* { MODKEY,                       XK_g,      setlayout,      {.v = &layouts[3]} }, // grid - was togglegaps in dwm */
-	{ MODKEY,                    XKB_KEY_f,          togglefullscreen, {0} }, // dwm: XK_f | ShiftMask
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_F,          togglefullscreen, {0} }, // dwm: XK_f | ShiftMask
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,      togglefloating, {0} }, // dwm: XK_space | ShiftMask
 	/* { MODKEY,                       XK_0,      view,           {.ui = ~0 } }, // Using template default for view all */
 	{ MODKEY,                    XKB_KEY_0,          view,           {.ui = ~0} }, // dwl template default

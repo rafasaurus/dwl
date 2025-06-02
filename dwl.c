@@ -108,6 +108,7 @@ typedef struct {
 	unsigned int type; /* XDGShell or X11* */
 	int interact;
 	Monitor *mon;
+	char *output;
 	struct wlr_scene_tree *scene;
 	struct wlr_scene_rect *border[4]; /* top, bottom, left, right */
 	struct wlr_scene_tree *scene_surface;
@@ -133,6 +134,7 @@ typedef struct {
 #ifdef XWAYLAND
 	struct wl_listener activate;
 	struct wl_listener associate;
+	struct wl_listener minimize;
 	struct wl_listener dissociate;
 	struct wl_listener configure;
 	struct wl_listener set_hints;
@@ -503,6 +505,8 @@ static void associatex11(struct wl_listener *listener, void *data);
 static void configurex11(struct wl_listener *listener, void *data);
 static void createnotifyx11(struct wl_listener *listener, void *data);
 static void dissociatex11(struct wl_listener *listener, void *data);
+static xcb_atom_t getatom(xcb_connection_t *xc, const char *name);
+static void minimizenotify(struct wl_listener *listener, void *data);
 static void sethints(struct wl_listener *listener, void *data);
 static void xwaylandready(struct wl_listener *listener, void *data);
 static struct wl_listener new_xwayland_surface = {.notify = createnotifyx11};
@@ -569,6 +573,10 @@ applyrules(Client *c)
 					mon = m;
 			}
 		}
+	}
+	if (mon) {
+		c->geom.x = (mon->w.width - c->geom.width) / 2 + mon->m.x;
+		c->geom.y = (mon->w.height - c->geom.height) / 2 + mon->m.y;
 	}
 	setmon(c, mon, newtags);
 }
@@ -1159,6 +1167,7 @@ createmon(struct wl_listener *listener, void *data)
 	size_t i;
 	struct wlr_output_state state;
 	Monitor *m;
+	Client *c;
 
 	if (!wlr_output_init_render(wlr_output, alloc, drw))
 		return;
@@ -1247,6 +1256,13 @@ createmon(struct wl_listener *listener, void *data)
 		wlr_output_layout_add_auto(output_layout, wlr_output);
 	else
 		wlr_output_layout_add(output_layout, wlr_output, m->m.x, m->m.y);
+
+	wl_list_for_each(c, &clients, link) {
+		if (strcmp(wlr_output->name, c->output) == 0) {
+			c->mon = m;
+		}
+	}
+	updatemons(NULL, NULL);
 }
 
 void
@@ -1521,6 +1537,7 @@ destroynotify(struct wl_listener *listener, void *data)
 		wl_list_remove(&c->activate.link);
 		wl_list_remove(&c->associate.link);
 		wl_list_remove(&c->configure.link);
+		wl_list_remove(&c->minimize.link);
 		wl_list_remove(&c->dissociate.link);
 		wl_list_remove(&c->set_hints.link);
 	} else
@@ -1531,6 +1548,7 @@ destroynotify(struct wl_listener *listener, void *data)
 		wl_list_remove(&c->unmap.link);
 		wl_list_remove(&c->maximize.link);
 	}
+	free(c->output);
 	free(c);
 }
 
@@ -2244,9 +2262,17 @@ mapnotify(struct wl_listener *listener, void *data)
 	 * try to apply rules for them */
 	if ((p = client_get_parent(c))) {
 		c->isfloating = 1;
+		if (p->mon) {
+			c->geom.x = (p->mon->w.width - c->geom.width) / 2 + p->mon->m.x;
+			c->geom.y = (p->mon->w.height - c->geom.height) / 2 + p->mon->m.y;
+		}
 		setmon(c, p->mon, p->tags);
 	} else {
 		applyrules(c);
+	}
+	c->output = strdup(c->mon->wlr_output->name);
+	if (c->output == NULL) {
+		die("oom");
 	}
 	printstatus();
 
@@ -3173,8 +3199,14 @@ void
 tagmon(const Arg *arg)
 {
 	Client *sel = focustop(selmon);
-	if (sel)
-		setmon(sel, dirtomon(arg->i), 0);
+	if (!sel)
+		return;
+	setmon(sel, dirtomon(arg->i), 0);
+	free(sel->output);
+	sel->output = strdup(sel->mon->wlr_output->name);
+	if (sel->output == NULL) {
+		die("oom");
+	}
 }
 
 void
@@ -3661,6 +3693,7 @@ createnotifyx11(struct wl_listener *listener, void *data)
 	LISTEN(&xsurface->events.destroy, &c->destroy, destroynotify);
 	LISTEN(&xsurface->events.dissociate, &c->dissociate, dissociatex11);
 	LISTEN(&xsurface->events.request_activate, &c->activate, activatex11);
+	LISTEN(&xsurface->events.request_minimize, &c->minimize, minimizenotify);
 	LISTEN(&xsurface->events.request_configure, &c->configure, configurex11);
 	LISTEN(&xsurface->events.request_fullscreen, &c->fullscreen, fullscreennotify);
 	LISTEN(&xsurface->events.set_hints, &c->set_hints, sethints);
@@ -3673,6 +3706,21 @@ dissociatex11(struct wl_listener *listener, void *data)
 	Client *c = wl_container_of(listener, c, dissociate);
 	wl_list_remove(&c->map.link);
 	wl_list_remove(&c->unmap.link);
+}
+
+void
+minimizenotify(struct wl_listener *listener, void *data)
+{
+	Client *c = wl_container_of(listener, c, minimize);
+	struct wlr_xwayland_surface *xsurface = c->surface.xwayland;
+	struct wlr_xwayland_minimize_event *e = data;
+	int focused;
+
+	if (xsurface->surface == NULL || !xsurface->surface->mapped)
+		return;
+
+	focused = seat->keyboard_state.focused_surface == xsurface->surface;
+	wlr_xwayland_surface_set_minimized(xsurface, !focused && e->minimize);
 }
 
 void

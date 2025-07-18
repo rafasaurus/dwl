@@ -204,7 +204,7 @@ inspiration, and to the various contributors to the project, including:
 Rafasaurus notes, installed patches
 ipc.patch
 genericgaps.patch
-deck.patch
+deck.patch, this has been removed from dwl-paches, look at 7da34dd6a781a5d5b1f9efeaffc4e52a718ff34b commit
 pertag.patch
 simple_scratchpad-v0.7.patch
 wlr-output-power-management-unstable-v1-protocol.h

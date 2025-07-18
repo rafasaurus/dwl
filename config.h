@@ -169,7 +169,7 @@ static const char *thunarcmd[] = { "sh", "-c", "thunar", "$HOME/Pictures/screens
 static const char *volumeup[] = { "pamixer", "-i","10", NULL };
 static const char *volumedown[] = { "pamixer", "-d","10", NULL };
 static const char *volumetoggle[] = { "amixer", "-D", "pulse", "set", "Master", "toggle", NULL };
-static const char *bookcmd[] = { "sh", "-c", "$HOME/.local/bin/book_cmd.sh", NULL };
+static const char *bookcmd[] = { "sh", "-c", "$HOME/.local/bin/open_pdfs.sh", NULL };
 static const char *builtinscreencmd[] = { "sh", "-c", "$HOME/.screenlayout/built-in.sh", NULL };
 
 /* Keybindings converted from dwm, removed bindings for bar, gaps, extra layouts, scratchpad etc. */

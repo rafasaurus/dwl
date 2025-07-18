@@ -208,4 +208,5 @@ deck.patch
 pertag.patch
 simple_scratchpad-v0.7.patch
 wlr-output-power-management-unstable-v1-protocol.h
-
+togglekblayoutandoptions.patch
+xwayland-handle-minimize.patch

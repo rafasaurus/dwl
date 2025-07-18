@@ -15,7 +15,7 @@ static const unsigned int gappiv           = 10; /* vert inner gap between windo
 static const unsigned int gappoh           = 10; /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov           = 10; /* vert outer gap between windows and screen edge */
 static const int smartborders              = 1;
-static const unsigned int borderpx         = 3;  /* border pixel of windows (from dwm borderpx) */
+static const unsigned int borderpx         = 4;  /* border pixel of windows (from dwm borderpx) */
 static const float rootcolor[]             = COLOR(0x1C1021ff); /* from dwm normbgcolor */
 static const float bordercolor[]           = COLOR(0x333333ff); /* from dwm normbordercolor */
 static const float focuscolor[]            = COLOR(0x4F335Fff); /* from dwm selbordercolor */
@@ -138,12 +138,12 @@ static const int drag_lock = 1;
 static const int natural_scrolling = 0;
 static const int disable_while_typing = 1;
 static const int left_handed = 0;
-static const int middle_button_emulation = 0;
+static const int middle_button_emulation = 1;
 static const enum libinput_config_scroll_method scroll_method = LIBINPUT_CONFIG_SCROLL_2FG;
 static const enum libinput_config_click_method click_method = LIBINPUT_CONFIG_CLICK_METHOD_BUTTON_AREAS;
 static const uint32_t send_events_mode = LIBINPUT_CONFIG_SEND_EVENTS_ENABLED;
 static const enum libinput_config_accel_profile accel_profile = LIBINPUT_CONFIG_ACCEL_PROFILE_ADAPTIVE;
-static const double accel_speed = 0.0;
+static const double accel_speed = 0.1;
 static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TAP_MAP_LRM;
 
 /* If you want to use the windows key for MODKEY, use WLR_MODIFIER_LOGO */
@@ -169,6 +169,8 @@ static const char *thunarcmd[] = { "sh", "-c", "thunar", "$HOME/Pictures/screens
 static const char *volumeup[] = { "pamixer", "-i","10", NULL };
 static const char *volumedown[] = { "pamixer", "-d","10", NULL };
 static const char *volumetoggle[] = { "amixer", "-D", "pulse", "set", "Master", "toggle", NULL };
+static const char *bookcmd[] = { "sh", "-c", "$HOME/.local/bin/book_cmd.sh", NULL };
+static const char *builtinscreencmd[] = { "sh", "-c", "$HOME/.screenlayout/built-in.sh", NULL };
 
 /* Keybindings converted from dwm, removed bindings for bar, gaps, extra layouts, scratchpad etc. */
 static const Key keys[] = {
@@ -185,6 +187,8 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_P,          spawn,          {.v = scrcmd} },
 	{ MODKEY,                    XKB_KEY_o,          spawn,          {.v = launchcmd} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_O,          spawn,          {.v = thunarcmd} },
+	{ MODKEY|WLR_MODIFIER_SHIFT|WLR_MODIFIER_SHIFT, XKB_KEY_D,          spawn,          {.v = builtinscreencmd} },
+	{ MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT, XKB_KEY_O,          spawn,          {.v = bookcmd} },
 	{ MODKEY,                    XKB_KEY_Return,     spawn,          {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_b,          togglebar,      {0} },
 	/* { MODKEY|ShiftMask,             XK_j,      rotatestack,    {.i = +1 } }, // Removed: No rotatestack */

@@ -97,8 +97,6 @@ static const Layout layouts[] = {
 	{ "><>",      NULL },    /* no layout function means floating behavior */
 	{ "[M]",      monocle },
     { "[D]",      deck },
-	{ "TTT",      bstack },
-	{ "===",      bstackhoriz },
 };
 
 /* monitors */
@@ -217,8 +215,6 @@ static const Key keys[] = {
 	{ MODKEY,                    XKB_KEY_n,          setlayout,      {.v = &layouts[1]} }, /* floating (NULL) - dwm: XK_n */
 	{ MODKEY,                    XKB_KEY_m,          setlayout,      {.v = &layouts[2]} }, /* monocle */
     { MODKEY,                    XKB_KEY_d,          setlayout,      {.v = &layouts[3]} },
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_T,          setlayout,      {.v = &layouts[4]} },
-	{ MODKEY|WLR_MODIFIER_SHIFT| WLR_MODIFIER_CTRL,                    XKB_KEY_T,          setlayout,      {.v = &layouts[5]} },
 	{ MODKEY,                    XKB_KEY_e,          togglescratchpad,    {0} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_E,          addscratchpad, {0} },
 	{ MODKEY,                    XKB_KEY_equal,          removescratchpad, {0} },

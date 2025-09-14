@@ -75,7 +75,7 @@ seatd daemon.
 When dwl is run with no arguments, it will launch the server and begin handling
 any shortcuts configured in `config.h`. There is no status bar or other
 decoration initially; these are instead clients that can be run within the
-Wayland session. Do note that the default background color is black. This can be
+Wayland session. Do note that the default background color is grey. This can be
 modified in `config.h`.
 
 If you would like to run a script or command automatically at startup, you can
@@ -103,7 +103,7 @@ automatically, you will need to configure it prior to launching `dwl`, e.g.:
 
 Information about selected layouts, current window title, app-id, and
 selected/occupied/urgent tags is written to the stdin of the `-s` command (see
-the `printstatus()` function for details).  This information can be used to
+the `STATUS INFORMATION` section in `_dwl_(1)`).  This information can be used to
 populate an external status bar with a script that parses the
 information. Failing to read this information will cause dwl to block, so if you
 do want to run a startup command that does not consume the status information,

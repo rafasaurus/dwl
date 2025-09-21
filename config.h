@@ -15,11 +15,18 @@ static const unsigned int gappiv           = 10; /* vert inner gap between windo
 static const unsigned int gappoh           = 10; /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov           = 10; /* vert outer gap between windows and screen edge */
 static const int smartborders              = 1;
-static const unsigned int borderpx         = 4;  /* border pixel of windows (from dwm borderpx) */
+static const unsigned int borderpx         = 2;  /* border pixel of windows (from dwm borderpx) */
+#if 0
 static const float rootcolor[]             = COLOR(0x1C1021ff); /* from dwm normbgcolor */
 static const float bordercolor[]           = COLOR(0x333333ff); /* from dwm normbordercolor */
 static const float focuscolor[]            = COLOR(0x4F335Fff); /* from dwm selbordercolor */
 static const float urgentcolor[]           = COLOR(0xff0000ff); /* Default red */
+#else
+static const float rootcolor[]             = COLOR(0x222222ff);
+static const float bordercolor[]           = COLOR(0x444444ff);
+static const float focuscolor[]            = COLOR(0x005577ff);
+static const float urgentcolor[]           = COLOR(0xff0000ff);
+#endif
 /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.1f, 0.1f, 0.1f, 1.0f}; /* Default */
 

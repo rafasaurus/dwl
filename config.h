@@ -87,6 +87,7 @@ static const Rule rules[] = {
 	{ NULL,                   "popup",                0,            1,           -1 }, // Was centered=1, noswallow removed
 	{ "wmbubble",             NULL,                   0,            1,           -1 }, // Was centered=1
 	{ "Pavucontrol",          NULL,                   0,            1,           -1 }, // Was centered=1
+	{ "librepods",          NULL,                   0,            1,           -1 }, // Was centered=1
 	{ "shermans_applet",      NULL,                   0,            1,           -1 }, // Was centered=1, noswallow removed
 	{ "wmforecast",           NULL,                   0,            1,           -1 }, // Was centered=1, noswallow removed
 	{ "wmfishtime",           NULL,                   0,            1,           -1 }, // Was centered=1, noswallow removed

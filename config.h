@@ -178,7 +178,7 @@ static const char *thunarcmd[] = { "sh", "-c", "thunar", "$HOME/Pictures/screens
 static const char *volumeup[] = { "pamixer", "-i","10", NULL };
 static const char *volumedown[] = { "pamixer", "-d","10", NULL };
 static const char *volumetoggle[] = { "amixer", "-D", "pulse", "set", "Master", "toggle", NULL };
-static const char *bookcmd[] = { "sh", "-c", "$open_pdfs.sh", NULL };
+static const char *openpdfcmd[] = { "open_pdfs.sh", NULL };
 
 /* Keybindings converted from dwm, removed bindings for bar, gaps, extra layouts, scratchpad etc. */
 static const Key keys[] = {
@@ -196,7 +196,7 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT|WLR_MODIFIER_CTRL, XKB_KEY_P,          spawn,          {.v = scrcmd} },
 	{ MODKEY,                    XKB_KEY_o,          spawn,          {.v = launchcmd} },
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_O,          spawn,          {.v = thunarcmd} },
-	{ MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT, XKB_KEY_O,          spawn,          {.v = bookcmd} },
+	{ MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT, XKB_KEY_O,          spawn,          {.v = openpdfcmd} },
 	{ MODKEY,                    XKB_KEY_Return,     spawn,          {.v = termcmd} },
 	{ MODKEY,                    XKB_KEY_b,          togglebar,      {0} },
 	/* { MODKEY|ShiftMask,             XK_j,      rotatestack,    {.i = +1 } }, // Removed: No rotatestack */

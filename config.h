@@ -198,7 +198,7 @@ static const Key keys[] = {
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_O,          spawn,          {.v = thunarcmd} },
 	{ MODKEY|WLR_MODIFIER_CTRL|WLR_MODIFIER_SHIFT, XKB_KEY_O,          spawn,          {.v = openpdfcmd} },
 	{ MODKEY,                    XKB_KEY_Return,     spawn,          {.v = termcmd} },
-	{ MODKEY,                    XKB_KEY_b,          togglebar,      {0} },
+	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_b,          togglebar,      {0} },
 	/* { MODKEY|ShiftMask,             XK_j,      rotatestack,    {.i = +1 } }, // Removed: No rotatestack */
 	/* { MODKEY|ShiftMask,             XK_k,      rotatestack,    {.i = -1 } }, // Removed: No rotatestack */
 	{ MODKEY,                    XKB_KEY_j,          focusstack,     {.i = +1} },

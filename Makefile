@@ -11,7 +11,7 @@ DWLDEVCFLAGS = -Wpedantic -Wall -Wextra -Wdeclaration-after-statement \
 	-Werror=implicit -Werror=return-type -Werror=incompatible-pointer-types \
 	-Wfloat-conversion
 
-CFLAGS = -O3 -march=native -fno-plt -flto
+CFLAGS = -O2 -march=native -fno-plt -flto
 LDFLAGS = -O3 -flto
 
 PKGS      = wayland-server xkbcommon libinput $(XLIBS)

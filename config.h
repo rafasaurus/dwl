@@ -174,10 +174,10 @@ static const char *brightup[] = { "brightnessctl", "set", "10%+", NULL };
 static const char *brightdown[] = { "brightnessctl", "set", "10%-", NULL };
 static const char *scrcmdselect[] = { "sh", "-c", "screenshot.sh -s", NULL };
 static const char *scrcmd[] = { "sh", "-c", "screenshot.sh", NULL };
-static const char *thunarcmd[] = { "sh", "-c", "thunar", "$HOME/Pictures/screenshots", NULL };
-static const char *volumeup[] = { "pamixer", "-i","10", NULL };
-static const char *volumedown[] = { "pamixer", "-d","10", NULL };
-static const char *volumetoggle[] = { "amixer", "-D", "pulse", "set", "Master", "toggle", NULL };
+static const char *thunarcmd[] = { "sh", "-c", "thunar $HOME/Pictures/screenshots", NULL };
+static const char *volumeup[]     = { "sh", "-c", "pamixer -i 1; dwlb-status --signal 0", NULL };
+static const char *volumedown[]   = { "sh", "-c", "pamixer -d 1; dwlb-status --signal 0", NULL };
+static const char *volumetoggle[] = { "sh", "-c", "pamixer -t; dwlb-status --signal 0", NULL };
 static const char *openpdfcmd[] = { "open_pdfs.sh", NULL };
 
 /* Keybindings converted from dwm, removed bindings for bar, gaps, extra layouts, scratchpad etc. */

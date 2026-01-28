@@ -125,14 +125,17 @@ static const struct xkb_rule_names xkb_rules[] = {
 	*/
     {
     .layout = "us",
+    .options = "caps:escape",
     },
     {
     .layout = "am",
     .variant = "phonetic",
+    .options = "caps:escape",
     },
     {
     .layout = "ru",
     .variant = "phonetic",
+    .options = "caps:escape",
     }
 };
 

@@ -192,6 +192,7 @@ static const char *volumeup[]     = { "sh", "-c", "pamixer -i 2; dwlb-status --s
 static const char *volumedown[]   = { "sh", "-c", "pamixer -d 2; dwlb-status --signal 0", NULL };
 static const char *volumetoggle[] = { "sh", "-c", "pamixer -t; dwlb-status --signal 0", NULL };
 static const char *openpdfcmd[] = { "open_pdfs.sh", NULL };
+static const char *sendesc[] = { "wtype", "-k", "Escape", NULL };
 
 #define SHIFT WLR_MODIFIER_SHIFT
 #define CTRL WLR_MODIFIER_CTRL
@@ -212,6 +213,7 @@ static const Key keys[] = {
     { MODKEY|SHIFT,         XKB_KEY_O,                      spawn,              {.v = thunarcmd} },
     { MODKEY|CTRL|SHIFT,    XKB_KEY_O,                      spawn,              {.v = openpdfcmd} },
     { MODKEY,               XKB_KEY_Return,                 spawn,              {.v = termcmd} },
+    { MODKEY,               XKB_KEY_grave,                  spawn,              {.v = sendesc} },
     { MODKEY|SHIFT,         XKB_KEY_b,                      togglebar,          {0} },
     { MODKEY,               XKB_KEY_j,                      focusstack,         {.i = +1} },
     { MODKEY,               XKB_KEY_k,                      focusstack,         {.i = -1} },

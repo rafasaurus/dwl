@@ -375,6 +375,7 @@ static void setsel(struct wl_listener *listener, void *data);
 static void setup(void);
 static void setxkbrules(const Arg *arg);
 static void spawn(const Arg *arg);
+static void spawn_reset_kb(const Arg *arg);
 static void startdrag(struct wl_listener *listener, void *data);
 static void tag(const Arg *arg);
 static void tagmon(const Arg *arg);
@@ -3173,6 +3174,13 @@ spawn(const Arg *arg)
 		execvp(((char **)arg->v)[0], (char **)arg->v);
 		die("dwl: execvp %s failed:", ((char **)arg->v)[0]);
 	}
+}
+void
+spawn_reset_kb(const Arg *arg) {
+    // Purpose of this is to reset keyboard layout before spawning
+    const Arg xkb_arg = {.i = 0};
+    setxkbrules(&xkb_arg);
+    spawn(arg);
 }
 
 void

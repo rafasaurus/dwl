@@ -21,7 +21,7 @@ static const float urgentcolor[]           = COLOR(0xff0000ff);
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
 
 /* tagging - TAGCOUNT must be no greater than 31 */
-#define TAGCOUNT (5)
+#define TAGCOUNT (7)
 
 /* logging */
 static int log_level = WLR_ERROR;
@@ -199,7 +199,6 @@ static const char *sendesc[] = { "wtype", "-k", "Escape", NULL };
 #define CTRL WLR_MODIFIER_CTRL
 static const Key keys[] = {
     /* modifier             key                             function        argument */
-    { 0,                    XKB_KEY_XF86AudioRaiseVolume,   spawn,              {.v = volumeup} },
     { 0,                    XKB_KEY_XF86AudioLowerVolume,   spawn,              {.v = volumedown} },
     { 0,                    XKB_KEY_XF86PowerOff,           spawn_reset_kb,     {.v = suspendwithlock} },
     { MODKEY|CTRL|SHIFT,    XKB_KEY_U,                      spawn,              {.v = volumeup} },
@@ -256,6 +255,8 @@ static const Key keys[] = {
 	TAGKEYS(          XKB_KEY_3, XKB_KEY_numbersign,                 2),
 	TAGKEYS(          XKB_KEY_4, XKB_KEY_dollar,                     3),
 	TAGKEYS(          XKB_KEY_5, XKB_KEY_percent,                    4),
+	TAGKEYS(          XKB_KEY_6, XKB_KEY_ampersand,                  5),
+	TAGKEYS(          XKB_KEY_7, XKB_KEY_apostrophe,                 6),
 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Q,          quit,           {0} },
 
 	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */

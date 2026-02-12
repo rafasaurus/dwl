@@ -199,6 +199,7 @@ static const char *sendesc[] = { "wtype", "-k", "Escape", NULL };
 #define CTRL WLR_MODIFIER_CTRL
 static const Key keys[] = {
     /* modifier             key                             function        argument */
+    { 0,                    XKB_KEY_XF86AudioRaiseVolume,   spawn,              {.v = volumeup} },
     { 0,                    XKB_KEY_XF86AudioLowerVolume,   spawn,              {.v = volumedown} },
     { 0,                    XKB_KEY_XF86PowerOff,           spawn_reset_kb,     {.v = suspendwithlock} },
     { MODKEY|CTRL|SHIFT,    XKB_KEY_U,                      spawn,              {.v = volumeup} },

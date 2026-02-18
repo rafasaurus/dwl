@@ -31,61 +31,38 @@ static int log_level = WLR_ERROR;
 /* dwm class maps roughly to dwl app_id */
 static const Rule rules[] = {
 	/* app_id                title                    tags mask     isfloating   monitor */
-	{ "mm-connection-editor", NULL,                   0,            1,           -1 },
-	{ "qtpass",               NULL,                   0,            1,           -1 },
-	{ "firefox",              NULL,                   1 << 1,       0,           -1 },
-	{ "LibreWolf",            NULL,                   1 << 1,       0,           -1 },
-	{ "Google-chrome",        NULL,                   1 << 1,       0,           -1 },
-	{ "Firefox",              "Firefox Preferences",  0,            1,           -1 }, // Assuming app_id is "Firefox"
-	{ "Nightly",              NULL,                   1 << 1,       0,           -1 },
-	{ "TelegramDesktop",      NULL,                   1 << 2,       0,           -1 },
+	{ "anki",                 NULL,                   1 << 3,       0,           -1 },
+	{ "apm planner*",         NULL,                   1 << 4,       0,           -1 },
+	{ "brave",                NULL,                   1 << 1,       0,           -1 },
+	{ "brave-browser",        NULL,                   1 << 1,       0,           -1 },
+	{ "chromium",             NULL,                   1 << 1,       0,           -1 },
+	{ "cpupower-gui",         NULL,                   0,            1,           -1 },
+	{ "darktable",            NULL,                   1 << 3,       0,           -1 },
 	{ "dino",                 NULL,                   1 << 2,       0,           -1 },
-	{ "KotatogramDesktop",    NULL,                   1 << 2,       0,           -1 },
-	{ "Signal",               NULL,                   1 << 2,       0,           -1 },
-	{ "Zeal",                 NULL,                   1 << 3,       0,           -1 },
-	{ "Anki",                 NULL,                   1 << 3,       0,           -1 },
-	{ "Darktable",            NULL,                   1 << 3,       0,           -1 },
-	{ "Surf",                 NULL,                   1 << 3,       0,           -1 }, // Note: dwl might see Surf differently
+	{ "firefox",              NULL,                   1 << 1,       0,           -1 },
+	{ "google-chrome",        NULL,                   1 << 1,       0,           -1 },
+	{ "librepods",            NULL,                   0,            1,           -1 },
+	{ "librewolf",            NULL,                   1 << 1,       0,           -1 },
+	{ "nm-connection-editor", NULL,                   0,            1,           -1 },
 	{ "obsidian",             NULL,                   1 << 3,       0,           -1 },
-	{ "MATLAB R2024a",        NULL,                   1 << 3,       0,           -1 }, // Check if app_id is correct
-	{ "Notion",               NULL,                   1 << 4,       0,           -1 },
-	{ "notion-app",           NULL,                   1 << 4,       0,           -1 },
-	{ "Spotify",              NULL,                   1 << 4,       1,           -1 }, // Was centered=1, now just floating=1
-	{ "transmission",         NULL,                   1 << 4,       0,           -1 }, // Assuming app_id is "transmission"
-	{ "VirtualBox Machine",   NULL,                   1 << 4,       0,           -1 }, // Check app_id
-	{ "VirtualBox Manager",   NULL,                   1 << 4,       0,           -1 }, // Check app_id
-	{ "jetbrains-studio",     NULL,                   1 << 4,       0,           -1 },
-	{ NULL,                   "VP",                   1 << 3,       1,           -1 }, // Was centered=1
-	{ "Synergy",              NULL,                   1 << 4,       0,           -1 }, // Check app_id
-	{ "APM Planner",          NULL,                   1 << 4,       0,           -1 }, // Check app_id
-	{ "Google Earth Pro",     NULL,                   1 << 4,       0,           -1 }, // Check app_id
-	{ "Barrier",              NULL,                   1 << 4,       0,           -1 }, // Check app_id
-	{ "rhythmbox",            NULL,                   0,            1,           -1 }, // Was centered=1
-	{ "pavucontrol",          NULL,                   0,            1,           -1 }, // Was centered=1
-	{ "QtPass",               NULL,                   0,            1,           -1 }, // Was centered=1
-	{ "Rhythmbox",            NULL,                   0,            1,           -1 }, // Was centered=1
-	{ "Pcmanfm",              NULL,                   0,            1,           -1 }, // Was centered=1
-	{ "Mavproxy",             NULL,                   1 << 3,       1,           -1 }, // Check app_id
+	{ "oracle virtualbox machine",   NULL,            1 << 4,       0,           -1 },
+	{ "oracle virtualbox manager",   NULL,            1 << 4,       0,           -1 },
+	{ "pavucontrol",          NULL,                   0,            1,           -1 },
+	{ "qbittorrent",          NULL,                   1 << 4,       0,           -1 },
+	{ "qgroundcontrol",       "QGroundControl",       1 << 3,       0,           -1 },
+	{ "qtpass",               NULL,                   0,            1,           -1 },
+	{ "rhythmbox",            NULL,                   0,            1,           -1 },
+	{ "signal",               NULL,                   1 << 2,       0,           -1 },
+	{ "element",              NULL,                   1 << 2,       0,           -1 },
+	{ "spotify",              NULL,                   1 << 4,       1,           -1 },
+	{ "telegram",             NULL,                   1 << 2,       0,           -1 },
+	{ "telegramdesktop",      NULL,                   1 << 2,       0,           -1 },
+	{ "transmission",         NULL,                   1 << 4,       0,           -1 },
 	{ "vlc",                  NULL,                   1 << 4,       0,           -1 },
-	{ "sxiv",                 NULL,                   0,            0,           -1 },
-	{ "mpv",                  NULL,                   0,            0,           -1 },
-	{ "St",                   NULL,                   0,            0,           -1 }, // Note: isterminal/noswallow removed
-	{ "Chromium",             NULL,                   1 << 1,       0,           -1 }, // Note: noswallow removed
-	{ "Brave-browser",        NULL,                   1 << 1,       0,           -1 }, // Note: noswallow removed
-	{ "Brave",                NULL,                   1 << 1,       0,           -1 }, // Note: noswallow removed
-	{ "QGroundControl",       NULL,                   1 << 3,       0,           -1 },
-	{ "XTerm",                NULL,                   1 << 4,       0,           -1 },
-	{ "Cpupower-gui",         NULL,                   0,            1,           -1 }, // Was centered=1
-	{ NULL,                   "popup",                0,            1,           -1 }, // Was centered=1, noswallow removed
-	{ "wmbubble",             NULL,                   0,            1,           -1 }, // Was centered=1
-	{ "Pavucontrol",          NULL,                   0,            1,           -1 }, // Was centered=1
-	{ "librepods",            NULL,                   0,            1,           -1 }, // Was centered=1
-	{ "shermans_applet",      NULL,                   0,            1,           -1 }, // Was centered=1, noswallow removed
-	{ "wmforecast",           NULL,                   0,            1,           -1 }, // Was centered=1, noswallow removed
-	{ "wmfishtime",           NULL,                   0,            1,           -1 }, // Was centered=1, noswallow removed
-    /* Example dwl rules */
-	{ "Gimp_EXAMPLE",         NULL,                   0,            1,           -1 },
-	{ "firefox_EXAMPLE",      NULL,                   1 << 8,       0,           -1 },
+	{ "wmbubble",             NULL,                   0,            1,           -1 },
+	{ "xterm",                "xterm",                1 << 4,       0,           -1 },
+	{ NULL,                   "VP",                   1 << 3,       1,           -1 },
+	{ NULL,                   "popup",                0,            1,           -1 },
 };
 
 /* layout(s) */
@@ -193,12 +170,13 @@ static const char *volumedown[]   = { "sh", "-c", "pamixer -d 3; dwlb-status --s
 static const char *volumetoggle[] = { "sh", "-c", "pamixer -t; dwlb-status --signal 0", NULL };
 static const char *suspendwithlock[] = { "sh", "-c", "lock.sh && systemctl suspend", NULL };
 static const char *openpdfcmd[] = { "open_pdfs.sh", NULL };
-static const char *sendesc[] = { "wtype", "-k", "Escape", NULL };
+// static const char *sendesc[] = { "wtype", "-k", "Escape", NULL };
 
 #define SHIFT WLR_MODIFIER_SHIFT
 #define CTRL WLR_MODIFIER_CTRL
 static const Key keys[] = {
-    /* modifier             key                             function        argument */
+    /* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
+    /* modifier                  key                 function        argument */
     { 0,                    XKB_KEY_XF86AudioRaiseVolume,   spawn,              {.v = volumeup} },
     { 0,                    XKB_KEY_XF86AudioLowerVolume,   spawn,              {.v = volumedown} },
     { 0,                    XKB_KEY_XF86PowerOff,           spawn_reset_kb,     {.v = suspendwithlock} },
@@ -215,7 +193,6 @@ static const Key keys[] = {
     { MODKEY|SHIFT,         XKB_KEY_O,                      spawn,              {.v = thunarcmd} },
     { MODKEY|CTRL|SHIFT,    XKB_KEY_O,                      spawn,              {.v = openpdfcmd} },
     { MODKEY,               XKB_KEY_Return,                 spawn,              {.v = termcmd} },
-    { MODKEY,               XKB_KEY_grave,                  spawn,              {.v = sendesc} },
     { MODKEY|SHIFT,         XKB_KEY_b,                      togglebar,          {0} },
     { MODKEY,               XKB_KEY_j,                      focusstack,         {.i = +1} },
     { MODKEY,               XKB_KEY_k,                      focusstack,         {.i = -1} },
@@ -251,14 +228,15 @@ static const Key keys[] = {
     { WLR_MODIFIER_LOGO,    XKB_KEY_u,                      setxkbrules,        {.i = +0} },
     { WLR_MODIFIER_LOGO,    XKB_KEY_a,                      setxkbrules,        {.i = +1} },
     { WLR_MODIFIER_LOGO,    XKB_KEY_r,                      setxkbrules,        {.i = +2} },
-	TAGKEYS(          XKB_KEY_1, XKB_KEY_exclam,                     0),
-	TAGKEYS(          XKB_KEY_2, XKB_KEY_at,                         1),
-	TAGKEYS(          XKB_KEY_3, XKB_KEY_numbersign,                 2),
-	TAGKEYS(          XKB_KEY_4, XKB_KEY_dollar,                     3),
-	TAGKEYS(          XKB_KEY_5, XKB_KEY_percent,                    4),
-	TAGKEYS(          XKB_KEY_6, XKB_KEY_ampersand,                  5),
-	TAGKEYS(          XKB_KEY_7, XKB_KEY_apostrophe,                 6),
-	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_Q,          quit,           {0} },
+    TAGKEYS(                XKB_KEY_1,                      XKB_KEY_exclam,     0),
+    TAGKEYS(                XKB_KEY_2,                      XKB_KEY_at,         1),
+    TAGKEYS(                XKB_KEY_3,                      XKB_KEY_numbersign, 2),
+    TAGKEYS(                XKB_KEY_4,                      XKB_KEY_dollar,     3),
+    TAGKEYS(                XKB_KEY_5,                      XKB_KEY_percent,    4),
+    TAGKEYS(                XKB_KEY_6,                      XKB_KEY_ampersand,  5),
+    TAGKEYS(                XKB_KEY_7,                      XKB_KEY_apostrophe, 6),
+    // TAGKEYS(                XKB_KEY_grave,                  XKB_KEY_asciitilde, 6),
+    { MODKEY|SHIFT,         XKB_KEY_Q,          quit,           {0} },
 
 	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
 	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_Terminate_Server, quit, {0} },

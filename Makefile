@@ -13,6 +13,7 @@ DWLDEVCFLAGS = -Wpedantic -Wall -Wextra -Wdeclaration-after-statement \
 
 CFLAGS = -O2 -march=native -fno-plt -flto
 LDFLAGS = -O3 -flto
+CFLAGS += -Wno-unused-function
 
 PKGS      = wayland-server xkbcommon libinput $(XLIBS)
 DWLCFLAGS = `$(PKG_CONFIG) --cflags $(PKGS)` $(WLR_INCS) $(DWLCPPFLAGS) $(DWLDEVCFLAGS) $(CFLAGS)

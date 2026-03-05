@@ -15,7 +15,7 @@ static const unsigned int gappoh           = 10; /* horiz outer gap between wind
 static const unsigned int gappov           = 10; /* vert outer gap between windows and screen edge */
 static const float rootcolor[]             = COLOR(0x222222ff);
 static const float bordercolor[]           = COLOR(0x444444ff);
-static const float focuscolor[]            = COLOR(0x00638bff);
+static const float focuscolor[]            = COLOR(0xB17C35aa);
 static const float urgentcolor[]           = COLOR(0xff0000ff);
 /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
@@ -31,7 +31,6 @@ static int log_level = WLR_ERROR;
 /* dwm class maps roughly to dwl app_id */
 static const Rule rules[] = {
 	/* app_id                title                    tags mask     isfloating   monitor */
-	{ "anki",                 NULL,                   1 << 3,       0,           -1 },
 	{ "apm planner*",         NULL,                   1 << 4,       0,           -1 },
 	{ "brave",                NULL,                   1 << 1,       0,           -1 },
 	{ "brave-browser",        NULL,                   1 << 1,       0,           -1 },

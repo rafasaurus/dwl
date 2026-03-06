@@ -106,7 +106,6 @@ typedef struct Monitor Monitor;
 typedef struct {
 	/* Must keep this field first */
 	unsigned int type; /* XDGShell or X11* */
-	int interact;
 	Monitor *mon;
 	char *output;
 	struct wlr_scene_tree *scene;
@@ -358,8 +357,7 @@ static void removescratchpad(const Arg *arg);
 static void requestdecorationmode(struct wl_listener *listener, void *data);
 static void requeststartdrag(struct wl_listener *listener, void *data);
 static void requestmonstate(struct wl_listener *listener, void *data);
-static void resizeapply(Client *c, struct wlr_box geo, int interact);
-static void resizenoapply(Client *c, struct wlr_box geo, int interact);
+static void resize(Client *c, struct wlr_box geo, int interact);
 static void run(char *startup_cmd);
 static void setcursor(struct wl_listener *listener, void *data);
 static void setcursorshape(struct wl_listener *listener, void *data);
@@ -490,7 +488,6 @@ static struct zdwl_ipc_manager_v2_interface dwl_manager_implementation = {.relea
 static struct zdwl_ipc_output_v2_interface dwl_output_implementation = {.release = dwl_ipc_output_release, .set_tags = dwl_ipc_output_set_tags, .set_layout = dwl_ipc_output_set_layout, .set_client_tags = dwl_ipc_output_set_client_tags};
 
 static int enablegaps = 1;   /* enables gaps, used by togglegaps */
-static void (*resize)(Client *c, struct wlr_box geo, int interact) = resizeapply;
 
 static struct wl_list scratchpad_clients;
 static int scratchpad_visible = 1;
@@ -584,24 +581,8 @@ applyrules(Client *c)
 }
 
 void
-applygaps(Client *c)
-{
-	struct wlr_box geom = c->geom;
-
-	if (!c->mon)
-		return;
-
-	geom.x      += c->mon->gappih + c->mon->gappoh;
-	geom.y      += c->mon->gappiv + c->mon->gappov;
-	geom.width  -= c->mon->gappih;
-	geom.height -= c->mon->gappiv;
-	resize(c, geom, 0);
-}
-
-void
 arrange(Monitor *m)
 {
-	int save_width, save_height;
 	Client *c;
 
 	if (!m->wlr_output->enabled)
@@ -633,26 +614,8 @@ arrange(Monitor *m)
 								: c->scene->node.parent);
 	}
 
-	if (m->lt[m->sellt]->arrange) {
-		save_width   = m->w.width;
-		save_height  = m->w.height;
-		if (enablegaps) {
-			m->w.width  -= m->gappih + 2 * m->gappoh;
-			m->w.height -= m->gappiv + 2 * m->gappov;
-		}
-		resize = resizenoapply;
+	if (m->lt[m->sellt]->arrange)
 		m->lt[m->sellt]->arrange(m);
-		wl_list_for_each(c, &clients, link) {
-			if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
-				continue;
-			if (enablegaps)
-				applygaps(c);
-			resizeapply(c, c->geom, c->interact);
-		}
-		m->w.width  = save_width;
-		m->w.height = save_height;
-		resize = resizeapply;
-	}
 	motionnotify(0, NULL, 0, 0, 0, 0);
 	checkidleinhibitor(NULL);
 }
@@ -1393,7 +1356,7 @@ cursorwarptohint(void)
 void
 deck(Monitor *m)
 {
-	unsigned int mw, my;
+	unsigned int mw, my, h, r, oe = enablegaps, ie = enablegaps;
 	int i, n = 0;
 	Client *c;
 
@@ -1403,21 +1366,28 @@ deck(Monitor *m)
 	if (n == 0)
 		return;
 
+	if (smartgaps == n) {
+		oe = 0;
+	}
+
 	if (n > m->nmaster)
-		mw = m->nmaster ? (int)round(m->w.width * m->mfact) : 0;
+		mw = m->nmaster ? (int)round((m->w.width + m->gappiv*ie) * m->mfact) : 0;
 	else
-		mw = m->w.width;
-	i = my = 0;
+		mw = m->w.width - 2*m->gappov*oe + m->gappiv*ie;
+	i = 0;
+	my = m->gappoh*oe;
 	wl_list_for_each(c, &clients, link) {
 		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
 			continue;
 		if (i < m->nmaster) {
-			resize(c, (struct wlr_box){.x = m->w.x, .y = m->w.y + my, .width = mw,
-				.height = (m->w.height - my) / (MIN(n, m->nmaster) - i)}, 0);
-			my += c->geom.height;
+			r = MIN(n, m->nmaster) - i;
+			h = (m->w.height - my - m->gappoh*oe - m->gappih*ie * (r - 1)) / r;
+			resize(c, (struct wlr_box){.x = m->w.x + m->gappov*oe, .y = m->w.y + my,
+				.width = mw - m->gappiv*ie, .height = h}, 0);
+			my += c->geom.height + m->gappih*ie;
 		} else {
-			resize(c, (struct wlr_box){.x = m->w.x + mw, .y = m->w.y,
-				.width = m->w.width - mw, .height = m->w.height}, 0);
+			resize(c, (struct wlr_box){.x = m->w.x + mw + m->gappov*oe, .y = m->w.y + m->gappoh*oe,
+				.width = m->w.width - mw - 2*m->gappov*oe, .height = m->w.height - 2*m->gappoh*oe}, 0);
 			if (c == focustop(m))
 				wlr_scene_node_raise_to_top(&c->scene->node);
 		}
@@ -2315,8 +2285,12 @@ monocle(Monitor *m)
 	wl_list_for_each(c, &clients, link) {
 		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
 			continue;
-		resize(c, m->w, 0);
 		n++;
+		if (!monoclegaps)
+			resize(c, m->w, 0);
+		else
+			resize(c, (struct wlr_box){.x = m->w.x + gappoh, .y = m->w.y + gappov,
+				.width = m->w.width - 2 * gappoh, .height = m->w.height - 2 * gappov}, 0);
 	}
 	if (n)
 		snprintf(m->ltsymbol, LENGTH(m->ltsymbol), "[%d]", n);
@@ -2660,7 +2634,7 @@ requestmonstate(struct wl_listener *listener, void *data)
 }
 
 void
-resizeapply(Client *c, struct wlr_box geo, int interact)
+resize(Client *c, struct wlr_box geo, int interact)
 {
 	struct wlr_box *bbox;
 	struct wlr_box clip;
@@ -2690,13 +2664,6 @@ resizeapply(Client *c, struct wlr_box geo, int interact)
 			c->geom.height - 2 * c->bw);
 	client_get_clip(c, &clip);
 	wlr_scene_subsurface_tree_set_clip(&c->scene_surface->node, &clip);
-}
-
-void
-resizenoapply(Client *c, struct wlr_box geo, int interact)
-{
-	c->geom = geo;
-	c->interact = interact;
 }
 
 void
@@ -3224,7 +3191,7 @@ tagmon(const Arg *arg)
 void
 tile(Monitor *m)
 {
-	unsigned int mw, my, ty;
+	unsigned int mw, my, ty, h, r, oe = enablegaps, ie = enablegaps;
 	int i, n = 0;
 	Client *c;
 
@@ -3234,22 +3201,31 @@ tile(Monitor *m)
 	if (n == 0)
 		return;
 
+	if (smartgaps == n) {
+		oe = 0;
+	}
+
 	if (n > m->nmaster)
-		mw = m->nmaster ? (int)roundf(m->w.width * m->mfact) : 0;
+		mw = m->nmaster ? (int)roundf((m->w.width + m->gappiv*ie) * m->mfact) : 0;
 	else
-		mw = m->w.width;
-	i = my = ty = 0;
+		mw = m->w.width - 2*m->gappov*oe + m->gappiv*ie;
+	i = 0;
+	my = ty = m->gappoh*oe;
 	wl_list_for_each(c, &clients, link) {
 		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
 			continue;
 		if (i < m->nmaster) {
-			resize(c, (struct wlr_box){.x = m->w.x, .y = m->w.y + my, .width = mw,
-				.height = (m->w.height - my) / (MIN(n, m->nmaster) - i)}, 0);
-			my += c->geom.height;
+			r = MIN(n, m->nmaster) - i;
+			h = (m->w.height - my - m->gappoh*oe - m->gappih*ie * (r - 1)) / r;
+			resize(c, (struct wlr_box){.x = m->w.x + m->gappov*oe, .y = m->w.y + my,
+				.width = mw - m->gappiv*ie, .height = h}, 0);
+			my += c->geom.height + m->gappih*ie;
 		} else {
-			resize(c, (struct wlr_box){.x = m->w.x + mw, .y = m->w.y + ty,
-				.width = m->w.width - mw, .height = (m->w.height - ty) / (n - i)}, 0);
-			ty += c->geom.height;
+			r = n - i;
+			h = (m->w.height - ty - m->gappoh*oe - m->gappih*ie * (r - 1)) / r;
+			resize(c, (struct wlr_box){.x = m->w.x + mw + m->gappov*oe, .y = m->w.y + ty,
+				.width = m->w.width - mw - 2*m->gappov*oe, .height = h}, 0);
+			ty += c->geom.height + m->gappih*ie;
 		}
 		i++;
 	}

@@ -388,6 +388,7 @@ static void toggleview(const Arg *arg);
 static void unlocksession(struct wl_listener *listener, void *data);
 static void unmaplayersurfacenotify(struct wl_listener *listener, void *data);
 static void unmapnotify(struct wl_listener *listener, void *data);
+static void updatecapabilities(void);
 static void updatemons(struct wl_listener *listener, void *data);
 static void updatetitle(struct wl_listener *listener, void *data);
 static void urgent(struct wl_listener *listener, void *data);
@@ -2034,7 +2035,6 @@ inputdevice(struct wl_listener *listener, void *data)
 	/* This event is raised by the backend when a new input device becomes
 	 * available. */
 	struct wlr_input_device *device = data;
-	uint32_t caps;
 
 	switch (device->type) {
 	case WLR_INPUT_DEVICE_KEYBOARD:
@@ -2048,14 +2048,7 @@ inputdevice(struct wl_listener *listener, void *data)
 		break;
 	}
 
-	/* We need to let the wlr_seat know what our capabilities are, which is
-	 * communiciated to the client. In dwl we always have a cursor, even if
-	 * there are no pointer devices, so we always include that capability. */
-	/* TODO do we actually require a cursor? */
-	caps = WL_SEAT_CAPABILITY_POINTER;
-	if (!wl_list_empty(&kb_group->wlr_group->devices))
-		caps |= WL_SEAT_CAPABILITY_KEYBOARD;
-	wlr_seat_set_capabilities(seat, caps);
+	updatecapabilities();
 }
 
 int
@@ -3378,6 +3371,21 @@ unmapnotify(struct wl_listener *listener, void *data)
 }
 
 void
+updatecapabilities(void)
+{
+	uint32_t caps;
+
+	/* We need to let the wlr_seat know what our capabilities are, which is
+	 * communicated to the client. In dwl we always have a cursor, even if
+	 * there are no pointer devices, so we always include that capability. */
+	/* TODO do we actually require a cursor? */
+	caps = WL_SEAT_CAPABILITY_POINTER;
+	if (!wl_list_empty(&kb_group->wlr_group->devices))
+		caps |= WL_SEAT_CAPABILITY_KEYBOARD;
+	wlr_seat_set_capabilities(seat, caps);
+}
+
+void
 updatemons(struct wl_listener *listener, void *data)
 {
 	/*
@@ -3560,11 +3568,15 @@ void
 virtualpointer(struct wl_listener *listener, void *data)
 {
 	struct wlr_virtual_pointer_v1_new_pointer_event *event = data;
-	struct wlr_input_device *device = &event->new_pointer->pointer.base;
+	struct wlr_virtual_pointer_v1 *pointer = event->new_pointer;
+	struct wlr_input_device *device = &pointer->pointer.base;
+	createpointer(&pointer->pointer);
+	updatecapabilities();
 
-	wlr_cursor_attach_input_device(cursor, device);
-	if (event->suggested_output)
-		wlr_cursor_map_input_to_output(cursor, device, event->suggested_output);
+	if (event->suggested_output) {
+		wlr_cursor_map_input_to_output(cursor, device,
+			event->suggested_output);
+	}
 }
 
 Monitor *

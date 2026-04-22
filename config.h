@@ -169,10 +169,12 @@ static const char *volumeup[]     = { "sh", "-c", "pamixer -i 3; dwlb-status --s
 static const char *volumedown[]   = { "sh", "-c", "pamixer -d 3; dwlb-status --signal 0", NULL };
 static const char *volumetoggle[] = { "sh", "-c", "pamixer -t; dwlb-status --signal 0", NULL };
 static const char *suspendwithlock[] = { "sh", "-c", "lock.sh && systemctl suspend", NULL };
+static const char *suspend[] = { "sh", "-c", "lock.sh", NULL };
 static const char *openpdfcmd[] = { "open_pdfs.sh", NULL };
 // static const char *sendesc[] = { "wtype", "-k", "Escape", NULL };
 
 #define SHIFT WLR_MODIFIER_SHIFT
+#define LOGO WLR_MODIFIER_LOGO
 #define CTRL WLR_MODIFIER_CTRL
 static const Key keys[] = {
     /* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
@@ -225,9 +227,11 @@ static const Key keys[] = {
     { MODKEY,               XKB_KEY_u,                      setxkbrules,        {.i = +0} },
     { MODKEY,               XKB_KEY_a,                      setxkbrules,        {.i = +1} },
     { MODKEY,               XKB_KEY_r,                      setxkbrules,        {.i = +2} },
-    { WLR_MODIFIER_LOGO,    XKB_KEY_u,                      setxkbrules,        {.i = +0} },
-    { WLR_MODIFIER_LOGO,    XKB_KEY_a,                      setxkbrules,        {.i = +1} },
-    { WLR_MODIFIER_LOGO,    XKB_KEY_r,                      setxkbrules,        {.i = +2} },
+    { LOGO,                 XKB_KEY_u,                      setxkbrules,        {.i = +0} },
+    { LOGO,                 XKB_KEY_a,                      setxkbrules,        {.i = +1} },
+    { LOGO,                 XKB_KEY_r,                      setxkbrules,        {.i = +2} },
+    { LOGO,                 XKB_KEY_l,                      spawn,              {.v = suspend} },
+    { LOGO|SHIFT,           XKB_KEY_L,                      spawn,              {.v = suspendwithlock} },
     TAGKEYS(                XKB_KEY_1,                      XKB_KEY_exclam,     0),
     TAGKEYS(                XKB_KEY_2,                      XKB_KEY_at,         1),
     TAGKEYS(                XKB_KEY_3,                      XKB_KEY_numbersign, 2),

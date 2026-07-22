@@ -169,6 +169,7 @@ static const char *volumeup[]     = { "sh", "-c", "pamixer -i 3; dwlb-status --s
 static const char *volumedown[]   = { "sh", "-c", "pamixer -d 3; dwlb-status --signal 0", NULL };
 static const char *volumetoggle[] = { "sh", "-c", "pamixer -t; dwlb-status --signal 0", NULL };
 static const char *suspendwithlock[] = { "sh", "-c", "lock.sh && systemctl suspend", NULL };
+static const char *powerscript[] = { "sh", "-c", "power", NULL };
 static const char *suspend[] = { "sh", "-c", "lock.sh", NULL };
 static const char *openpdfcmd[] = { "open_pdfs.sh", NULL };
 // static const char *sendesc[] = { "wtype", "-k", "Escape", NULL };
@@ -181,7 +182,7 @@ static const Key keys[] = {
     /* modifier                  key                 function        argument */
     { 0,                    XKB_KEY_XF86AudioRaiseVolume,   spawn,              {.v = volumeup} },
     { 0,                    XKB_KEY_XF86AudioLowerVolume,   spawn,              {.v = volumedown} },
-    { 0,                    XKB_KEY_XF86PowerOff,           spawn_reset_kb,     {.v = suspendwithlock} },
+    { 0,                    XKB_KEY_XF86PowerOff,           spawn_reset_kb,     {.v = powerscript} },
     { MODKEY|CTRL|SHIFT,    XKB_KEY_U,                      spawn,              {.v = volumeup} },
     { MODKEY|CTRL|SHIFT,    XKB_KEY_D,                      spawn,              {.v = volumedown} },
     { MODKEY|CTRL|SHIFT,    XKB_KEY_M,                      spawn,              {.v = volumetoggle} },

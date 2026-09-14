@@ -175,6 +175,8 @@ static const char *suspend[] = { "sh", "-c", "lock.sh", NULL };
 static const char *openpdfcmd[] = { "open_pdfs.sh", NULL };
 // static const char *sendesc[] = { "wtype", "-k", "Escape", NULL };
 
+static const char *ignorewindows[] = { "wmbubble", NULL };
+
 #define SHIFT WLR_MODIFIER_SHIFT
 #define LOGO WLR_MODIFIER_LOGO
 #define CTRL WLR_MODIFIER_CTRL
@@ -199,8 +201,8 @@ static const Key keys[] = {
     { MODKEY|CTRL|SHIFT,    XKB_KEY_O,                      spawn,              {.v = openpdfcmd} },
     { MODKEY,               XKB_KEY_Return,                 spawn,              {.v = termcmd} },
     { MODKEY|SHIFT,         XKB_KEY_b,                      togglebar,          {0} },
-    { MODKEY,               XKB_KEY_j,                      focusstack,         {.i = +1} },
-    { MODKEY,               XKB_KEY_k,                      focusstack,         {.i = -1} },
+    { MODKEY,               XKB_KEY_j,                      focusstackskip,     {.i = +1} },
+    { MODKEY,               XKB_KEY_k,                      focusstackskip,     {.i = -1} },
     { MODKEY,               XKB_KEY_w,                      incnmaster,         {.i = +1} },
     { MODKEY|SHIFT,         XKB_KEY_W,                      incnmaster,         {.i = -1} },
     { MODKEY,               XKB_KEY_h,                      setmfact,           {.f = -0.05f} },

@@ -318,6 +318,7 @@ static void dwl_ipc_output_release(struct wl_client *client, struct wl_resource 
 static void focusclient(Client *c, int lift);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
+static void focusstackskip(const Arg *arg);
 static Client *focustop(Monitor *m);
 static void fullscreennotify(struct wl_listener *listener, void *data);
 static void gpureset(struct wl_listener *listener, void *data);
@@ -1891,6 +1892,43 @@ focusstack(const Arg *arg)
 			if (&c->link == &clients)
 				continue; /* wrap past the sentinel node */
 			if (VISIBLEON(c, selmon))
+				break; /* found it */
+		}
+	}
+	/* If only one client is visible on selmon, then c == sel */
+	focusclient(c, 1);
+}
+
+static int
+isskipwindow(Client *c)
+{
+	const char *appid = client_get_appid(c);
+	int i;
+	for (i = 0; ignorewindows[i]; i++)
+		if (!strcmp(appid, ignorewindows[i]))
+			return 1;
+	return 0;
+}
+
+void
+focusstackskip(const Arg *arg)
+{
+	/* Focus the next or previous non-skipped client (in tiling order) on selmon */
+	Client *c, *sel = focustop(selmon);
+	if (!sel || (sel->isfullscreen && !client_has_children(sel)))
+		return;
+	if (arg->i > 0) {
+		wl_list_for_each(c, &sel->link, link) {
+			if (&c->link == &clients)
+				continue; /* wrap past the sentinel node */
+			if (VISIBLEON(c, selmon) && !isskipwindow(c))
+				break; /* found it */
+		}
+	} else {
+		wl_list_for_each_reverse(c, &sel->link, link) {
+			if (&c->link == &clients)
+				continue; /* wrap past the sentinel node */
+			if (VISIBLEON(c, selmon) && !isskipwindow(c))
 				break; /* found it */
 		}
 	}

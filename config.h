@@ -16,7 +16,7 @@ static const unsigned int gappoh           = 10; /* horiz outer gap between wind
 static const unsigned int gappov           = 10; /* vert outer gap between windows and screen edge */
 static const float rootcolor[]             = COLOR(0x222222ff);
 static const float bordercolor[]           = COLOR(0x444444ff);
-static const float focuscolor[]            = COLOR(0xB17C35ff);
+static const float focuscolor[]            = COLOR(0xD4B876ff);
 static const float urgentcolor[]           = COLOR(0xff0000ff);
 /* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.0f, 0.0f, 0.0f, 1.0f}; /* You can also use glsl colors */
@@ -208,8 +208,8 @@ static const Key keys[] = {
     { MODKEY|SHIFT,         XKB_KEY_W,                      incnmaster,         {.i = -1} },
     { MODKEY,               XKB_KEY_h,                      setmfact,           {.f = -0.05f} },
     { MODKEY,               XKB_KEY_l,                      setmfact,           {.f = +0.05f} },
-    { MODKEY,               XKB_KEY_s,                      incgaps,            {.i = +10 } },
-    { MODKEY|SHIFT,         XKB_KEY_S,                      incgaps,            {.i = -10 } },
+    { MODKEY,               XKB_KEY_s,                      incgaps,            {.i = +5 } },
+    { MODKEY|SHIFT,         XKB_KEY_S,                      incgaps,            {.i = -5 } },
     { MODKEY,               XKB_KEY_g,                      togglegaps,         {0} },
     { MODKEY|SHIFT,         XKB_KEY_G,                      defaultgaps,        {0} },
     { MODKEY,               XKB_KEY_space,                  zoom,               {0} },

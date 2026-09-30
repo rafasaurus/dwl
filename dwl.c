@@ -3114,8 +3114,18 @@ void
 setup(void)
 {
 	int drm_fd, i, sig[] = {SIGCHLD, SIGINT, SIGTERM, SIGPIPE};
+	const char *cursor_theme = getenv("XCURSOR_THEME");
+	const char *cursor_size_env = getenv("XCURSOR_SIZE");
+	char *cursor_size_end;
+	unsigned long cursor_size, size;
 	struct sigaction sa = {.sa_flags = SA_RESTART, .sa_handler = handlesig};
 	sigemptyset(&sa.sa_mask);
+	cursor_size = 24;
+	if (cursor_size_env && *cursor_size_env) {
+		size = strtoul(cursor_size_env, &cursor_size_end, 10);
+		if (!*cursor_size_end && size > 0 && size <= UINT_MAX)
+			cursor_size = size;
+	}
 
 	for (i = 0; i < (int)LENGTH(sig); i++)
 		sigaction(sig[i], &sa, NULL);
@@ -3277,8 +3287,12 @@ setup(void)
 	 * Xcursor themes to source cursor images from and makes sure that cursor
 	 * images are available at all scale factors on the screen (necessary for
 	 * HiDPI support). Scaled cursors will be loaded with each output. */
-	cursor_mgr = wlr_xcursor_manager_create(NULL, 24);
-	setenv("XCURSOR_SIZE", "24", 1);
+	/*
+	 * Use the session cursor settings for both the compositor and its clients.
+	 * wlroots loads the requested logical size at every output scale, keeping
+	 * the cursor physically consistent when it crosses between mixed-DPI outputs.
+	 */
+	cursor_mgr = wlr_xcursor_manager_create(cursor_theme, cursor_size);
 
 	/*
 	 * wlr_cursor *only* displays an image on screen. It does not move around

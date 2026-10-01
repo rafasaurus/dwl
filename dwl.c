@@ -2542,9 +2542,15 @@ motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double d
 		wl_list_for_each(constraint, &pointer_constraints->constraints, link)
 			cursorconstrain(constraint);
 
-		if (active_constraint && cursor_mode != CurResize && cursor_mode != CurMove) {
+		if (active_constraint && cursor_mode != CurResize && cursor_mode != CurMove
+				&& active_constraint->surface == seat->pointer_state.focused_surface) {
+			/* Locked pointers also apply to layer surfaces, such as Lan Mouse's
+			 * capture strip. Send relative motion above without moving the cursor. */
+			if (active_constraint->type == WLR_POINTER_CONSTRAINT_V1_LOCKED)
+				return;
+
 			toplevel_from_wlr_surface(active_constraint->surface, &c, NULL);
-			if (c && active_constraint->surface == seat->pointer_state.focused_surface) {
+			if (c) {
 				sx = cursor->x - c->geom.x - c->bw;
 				sy = cursor->y - c->geom.y - c->bw;
 				if (wlr_region_confine(&active_constraint->region, sx, sy,
@@ -2552,9 +2558,6 @@ motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double d
 					dx = sx_confined - sx;
 					dy = sy_confined - sy;
 				}
-
-				if (active_constraint->type == WLR_POINTER_CONSTRAINT_V1_LOCKED)
-					return;
 			}
 		}
 

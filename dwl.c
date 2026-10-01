@@ -182,6 +182,7 @@ typedef struct {
 typedef struct {
 	struct wlr_keyboard_group *wlr_group;
 	struct wlr_keyboard *virtual_keyboard;
+	struct wl_list link;
 
 	xkb_keysym_t keysyms[2];
 	uint32_t mods;
@@ -472,6 +473,7 @@ static struct wlr_session_lock_v1 *cur_lock;
 
 static struct wlr_seat *seat;
 static KeyboardGroup *kb_group;
+static struct wl_list keyboard_groups;
 static unsigned int kblayout = 0;
 static unsigned int cursor_mode;
 static Client *grabc;
@@ -1174,6 +1176,7 @@ createkeyboardgroup(void)
 	LISTEN(&group->wlr_group->keyboard.events.modifiers, &group->modifiers, keypressmod);
 
 	group->key_repeat_source = wl_event_loop_add_timer(event_loop, keyrepeat, group);
+	wl_list_insert(&keyboard_groups, &group->link);
 
 	/* A seat can only have one keyboard, but this is a limitation of the
 	 * Wayland protocol - not wlroots. We assign all connected keyboards to the
@@ -1675,6 +1678,7 @@ destroykeyboardgroup(struct wl_listener *listener, void *data)
 	wl_list_remove(&group->key.link);
 	wl_list_remove(&group->modifiers.link);
 	wl_list_remove(&group->destroy.link);
+	wl_list_remove(&group->link);
 	wlr_keyboard_group_destroy(group->wlr_group);
 	free(group);
 }
@@ -1834,8 +1838,8 @@ dwl_ipc_output_set_client_tags(struct wl_client *client, struct wl_resource *res
 void
 incxkbrules(const Arg *arg)
 {
-	kblayout = (kblayout + arg->i) % LENGTH(xkb_rules);
-	assignkeymap(&kb_group->wlr_group->keyboard);
+	Arg layout = {.i = (kblayout + arg->i) % LENGTH(xkb_rules)};
+	setxkbrules(&layout);
 }
 
 void
@@ -3239,6 +3243,7 @@ setup(void)
 	wl_list_init(&clients);
 	wl_list_init(&fstack);
 	wl_list_init(&scratchpad_clients);
+	wl_list_init(&keyboard_groups);
 
 	xdg_shell = wlr_xdg_shell_create(dpy, 6);
 	wl_signal_add(&xdg_shell->events.new_toplevel, &new_xdg_toplevel);
@@ -3376,8 +3381,19 @@ setup(void)
 void
 setxkbrules(const Arg *arg)
 {
+	KeyboardGroup *group;
+	struct wlr_keyboard *keyboard = wlr_seat_get_keyboard(seat);
+
 	kblayout = arg->i;
-	assignkeymap(&kb_group->wlr_group->keyboard);
+	/* Remote input uses separate virtual keyboard groups. Keep their device
+	 * keymaps and group keymaps in sync with the local layout selection. */
+	wl_list_for_each(group, &keyboard_groups, link) {
+		if (group->virtual_keyboard)
+			assignkeymap(group->virtual_keyboard);
+		assignkeymap(&group->wlr_group->keyboard);
+	}
+	if (keyboard)
+		wlr_seat_set_keyboard(seat, keyboard);
 }
 
 void

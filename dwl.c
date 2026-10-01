@@ -1028,6 +1028,7 @@ commitlayersurfacenotify(struct wl_listener *listener, void *data)
 	struct wlr_layer_surface_v1 *layer_surface = l->layer_surface;
 	struct wlr_scene_tree *scene_layer = layers[layermap[layer_surface->current.layer]];
 	struct wlr_layer_surface_v1_state old_state;
+	int released_focus = 0;
 
 	if (l->layer_surface->initial_commit) {
 		client_set_scale(layer_surface->surface, l->mon->wlr_output->scale);
@@ -1041,12 +1042,14 @@ commitlayersurfacenotify(struct wl_listener *listener, void *data)
 		return;
 	}
 
-	if (layer_surface == exclusive_focus
+	if (l == exclusive_focus
 			&& layer_surface->current.keyboard_interactive !=
-				ZWLR_LAYER_SURFACE_V1_KEYBOARD_INTERACTIVITY_EXCLUSIVE)
+				ZWLR_LAYER_SURFACE_V1_KEYBOARD_INTERACTIVITY_EXCLUSIVE) {
 		exclusive_focus = NULL;
+		released_focus = 1;
+	}
 
-	if (layer_surface->current.committed == 0 && l->mapped == layer_surface->surface->mapped)
+	if (!released_focus && layer_surface->current.committed == 0 && l->mapped == layer_surface->surface->mapped)
 		return;
 	l->mapped = layer_surface->surface->mapped;
 
@@ -1059,6 +1062,9 @@ commitlayersurfacenotify(struct wl_listener *listener, void *data)
 	}
 
 	arrangelayers(l->mon);
+	if (released_focus && !exclusive_focus
+			&& seat->keyboard_state.focused_surface == layer_surface->surface)
+		focusclient(focustop(selmon), 1);
 }
 
 void

@@ -765,10 +765,12 @@ axisnotify(struct wl_listener *listener, void *data)
 		adir = event->delta > 0 ? AxisRight : AxisLeft;
 	keyboard = wlr_seat_get_keyboard(seat);
 	mods = keyboard ? wlr_keyboard_get_modifiers(keyboard) : 0;
-	for (a = axes; a < END(axes); a++) {
-		if (CLEANMASK(mods) == CLEANMASK(a->mod) && adir == a->dir && a->func) {
-			a->func(&a->arg);
-			return;
+	if (wl_list_empty(&shortcuts_inhibit_mgr->inhibitors)) {
+		for (a = axes; a < END(axes); a++) {
+			if (CLEANMASK(mods) == CLEANMASK(a->mod) && adir == a->dir && a->func) {
+				a->func(&a->arg);
+				return;
+			}
 		}
 	}
 
@@ -809,11 +811,15 @@ buttonpress(struct wl_listener *listener, void *data)
 
 		keyboard = wlr_seat_get_keyboard(seat);
 		mods = keyboard ? wlr_keyboard_get_modifiers(keyboard) : 0;
-		for (b = buttons; b < END(buttons); b++) {
-			if (CLEANMASK(mods) == CLEANMASK(b->mod) &&
-					event->button == b->button && b->func) {
-				b->func(&b->arg);
-				return;
+		/* Input capture must receive modifier+mouse shortcuts too; otherwise
+		 * the sending compositor swallows remote move/resize commands. */
+		if (wl_list_empty(&shortcuts_inhibit_mgr->inhibitors)) {
+			for (b = buttons; b < END(buttons); b++) {
+				if (CLEANMASK(mods) == CLEANMASK(b->mod) &&
+						event->button == b->button && b->func) {
+					b->func(&b->arg);
+					return;
+				}
 			}
 		}
 		break;
@@ -2594,7 +2600,8 @@ motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double d
 		return;
 	} else if (cursor_mode == CurResize) {
 		resize(grabc, (struct wlr_box){.x = grabc->geom.x, .y = grabc->geom.y,
-			.width = (int)round(cursor->x) - grabc->geom.x, .height = (int)round(cursor->y) - grabc->geom.y}, 1, 1);
+			.width = (int)round(cursor->x) - grabcx,
+			.height = (int)round(cursor->y) - grabcy}, 1, 1);
 		return;
 	}
 
@@ -2640,11 +2647,10 @@ moveresize(const Arg *arg)
 		wlr_cursor_set_xcursor(cursor, cursor_mgr, "all-scroll");
 		break;
 	case CurResize:
-		/* Doesn't work for X11 output - the next absolute motion event
-		 * returns the cursor to where it started */
-		wlr_cursor_warp_closest(cursor, NULL,
-				grabc->geom.x + grabc->geom.width,
-				grabc->geom.y + grabc->geom.height);
+		/* Keep the pointer in place: absolute input (e.g. Lan Mouse) cannot
+		 * follow a compositor-side warp. Resize by the drag delta instead. */
+		grabcx = (int)round(cursor->x) - grabc->geom.width;
+		grabcy = (int)round(cursor->y) - grabc->geom.height;
 		wlr_cursor_set_xcursor(cursor, cursor_mgr, "se-resize");
 		break;
 	}

@@ -1920,8 +1920,13 @@ focusclient(Client *c, int lift)
 	if (c && lift)
 		wlr_scene_node_raise_to_top(&c->scene->node);
 
-	if (c && client_surface(c) == old)
+	if (c && client_surface(c) == old) {
+		/* Focus can remain unchanged after capture or a drag ends; repair
+		 * the highlight even when no keyboard enter is needed. */
+		if (!client_is_unmanaged(c))
+			client_set_border_color(c, focuscolor);
 		return;
+	}
 
 	if ((old_client_type = toplevel_from_wlr_surface(old, &old_c, &old_l)) == XDGShell) {
 		struct wlr_xdg_popup *popup, *tmp;
@@ -1938,16 +1943,11 @@ focusclient(Client *c, int lift)
 		wl_list_insert(&fstack, &c->flink);
 		selmon = c->mon;
 		c->isurgent = 0;
-
-		/* Don't change border color if there is an exclusive focus or we are
-		 * handling a drag operation */
-		if (!exclusive_focus && !seat->drag)
-			client_set_border_color(c, focuscolor);
 	}
 
 	/* If an overlay is focused, don't focus or activate the client,
-	 * but only update its position in fstack to render its border with focuscolor
-	 * and focus it after the overlay is closed. */
+	 * but only update its position in fstack to focus it after the overlay
+	 * is closed. Leave border colors tied to actual keyboard focus. */
 	if (old && (!c || client_surface(c) != old)
 			&& old_client_type == LayerShell && wlr_scene_node_coords(
 				&old_l->scene->node, &unused_lx, &unused_ly)
@@ -1957,8 +1957,8 @@ focusclient(Client *c, int lift)
 
 	if (focused_client && focused_client != c && !(c && client_is_unmanaged(c))) {
 		struct wlr_surface *s = client_surface(focused_client);
-		if (c)
-			client_set_border_color(focused_client, bordercolor);
+		client_set_border_color(focused_client,
+				focused_client->isurgent ? urgentcolor : bordercolor);
 		if (s && s->mapped)
 			client_activate_surface(s, 0);
 		focused_client = NULL;
@@ -1983,8 +1983,10 @@ focusclient(Client *c, int lift)
 	/* Activate the new client */
 	client_activate_surface(client_surface(c), 1);
 
-	if (!client_is_unmanaged(c))
+	if (!client_is_unmanaged(c)) {
+		client_set_border_color(c, focuscolor);
 		focused_client = c;
+	}
 }
 
 void

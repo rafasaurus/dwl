@@ -1482,7 +1482,7 @@ cursorwarptohint(void)
 void
 deck(Monitor *m)
 {
-	unsigned int mw, my, h, r, oe = enablegaps, ie = enablegaps, draw_borders = 1;
+	int mw, my, h, r, oe = enablegaps, ie = enablegaps, draw_borders = 1;
 	int i, n = 0;
 	Client *c;
 
@@ -1510,7 +1510,8 @@ deck(Monitor *m)
 			continue;
 		if (i < m->nmaster) {
 			r = MIN(n, m->nmaster) - i;
-			h = (m->w.height - my - m->gappoh*oe - m->gappih*ie * (r - 1)) / r;
+			/* Client minimum sizes can exhaust the remaining column height. */
+			h = MAX(1, (m->w.height - my - m->gappoh*oe - m->gappih*ie * (r - 1)) / r);
 			resize(c, (struct wlr_box){.x = m->w.x + m->gappov*oe, .y = m->w.y + my,
 				.width = mw - m->gappiv*ie, .height = h}, 0, draw_borders);
 			my += c->geom.height + m->gappih*ie;
@@ -3469,7 +3470,7 @@ tagmon(const Arg *arg)
 void
 tile(Monitor *m)
 {
-	unsigned int mw, my, ty, h, r, oe = enablegaps, ie = enablegaps, draw_borders = 1;
+	int mw, my, ty, h, r, oe = enablegaps, ie = enablegaps, draw_borders = 1;
 	int i, n = 0;
 	Client *c;
 
@@ -3497,13 +3498,14 @@ tile(Monitor *m)
 			continue;
 		if (i < m->nmaster) {
 			r = MIN(n, m->nmaster) - i;
-			h = (m->w.height - my - m->gappoh*oe - m->gappih*ie * (r - 1)) / r;
+			/* Client minimum sizes can exhaust the remaining column height. */
+			h = MAX(1, (m->w.height - my - m->gappoh*oe - m->gappih*ie * (r - 1)) / r);
 			resize(c, (struct wlr_box){.x = m->w.x + m->gappov*oe, .y = m->w.y + my,
 				.width = mw - m->gappiv*ie, .height = h}, 0, draw_borders);
 			my += c->geom.height + m->gappih*ie;
 		} else {
 			r = n - i;
-			h = (m->w.height - ty - m->gappoh*oe - m->gappih*ie * (r - 1)) / r;
+			h = MAX(1, (m->w.height - ty - m->gappoh*oe - m->gappih*ie * (r - 1)) / r);
 			resize(c, (struct wlr_box){.x = m->w.x + mw + m->gappov*oe, .y = m->w.y + ty,
 				.width = m->w.width - mw - 2*m->gappov*oe, .height = h}, 0, draw_borders);
 			ty += c->geom.height + m->gappih*ie;

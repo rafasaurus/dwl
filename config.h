@@ -217,7 +217,7 @@ static const Key keys[] = {
     { MODKEY,               XKB_KEY_Tab,                    view,               {0} },
     { MODKEY|SHIFT,         XKB_KEY_C,                      killclient,         {0} },
     { MODKEY,               XKB_KEY_t,                      setlayout,          {.v = &layouts[0]} },
-    // { MODKEY,               XKB_KEY_n,                      setlayout,          {.v = &layouts[1]} },
+    { MODKEY,               XKB_KEY_n,                      setlayout,          {.v = &layouts[1]} },
     { MODKEY,               XKB_KEY_m,                      setlayout,          {.v = &layouts[2]} },
     { MODKEY|SHIFT,         XKB_KEY_T,                      setlayout,          {.v = &layouts[3]} },
     { MODKEY,               XKB_KEY_e,                      togglescratchpad,   {0} },

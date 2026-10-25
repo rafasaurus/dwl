@@ -2879,7 +2879,8 @@ resize(Client *c, struct wlr_box geo, int interact, int draw_borders)
 
 	client_set_bounds(c, geo.width, geo.height);
 	c->geom = geo;
-	c->bw = draw_borders ? borderpx : 0;
+	c->bw = !c->isfullscreen && (draw_borders
+			|| !c->mon->lt[c->mon->sellt]->arrange) ? borderpx : 0;
 	applybounds(c, bbox);
 
 	/* Update scene-graph, including borders */
@@ -3056,6 +3057,8 @@ setgaps(int oh, int ov, int ih, int iv)
 void
 setlayout(const Arg *arg)
 {
+	Client *c;
+
 	if (!selmon)
 		return;
 	if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt])
@@ -3064,9 +3067,10 @@ setlayout(const Arg *arg)
 		selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt] = (Layout *)arg->v;
 	strncpy(selmon->ltsymbol, selmon->lt[selmon->sellt]->symbol, LENGTH(selmon->ltsymbol));
 	if (!selmon->lt[selmon->sellt]->arrange) {
-		Client *c;
-		wl_list_for_each(c, &clients, link)
-			resize(c, c->mon->m, 0, 1);
+		wl_list_for_each(c, &clients, link) {
+			if (VISIBLEON(c, selmon) && !c->isfullscreen)
+				resize(c, c->geom, 0, 1);
+		}
 	}
 	arrange(selmon);
 	printstatus();

@@ -478,6 +478,8 @@ static unsigned int kblayout = 0;
 static unsigned int cursor_mode;
 static Client *grabc;
 static int grabcx, grabcy; /* client-relative */
+static struct wlr_pointer *absolute_pointer;
+static double absolute_x, absolute_y, absolute_offset_x, absolute_offset_y;
 
 static struct wlr_output_layout *output_layout;
 static struct wlr_box sgeom;
@@ -2520,13 +2522,23 @@ motionabsolute(struct wl_listener *listener, void *data)
 	struct wlr_pointer_motion_absolute_event *event = data;
 	double lx, ly, dx, dy;
 
-	if (!event->time_msec) /* this is 0 with virtual pointers */
-		wlr_cursor_warp_absolute(cursor, &event->pointer->base, event->x, event->y);
-
 	wlr_cursor_absolute_to_layout_coords(cursor, &event->pointer->base, event->x, event->y, &lx, &ly);
+	if (absolute_pointer != event->pointer) {
+		absolute_pointer = event->pointer;
+		absolute_offset_x = absolute_offset_y = 0;
+	}
+	absolute_x = lx;
+	absolute_y = ly;
+	lx += absolute_offset_x;
+	ly += absolute_offset_y;
+	if (!event->time_msec) /* this is 0 with virtual pointers */
+		wlr_cursor_warp_closest(cursor, &event->pointer->base, lx, ly);
 	dx = lx - cursor->x;
 	dy = ly - cursor->y;
 	motionnotify(event->time_msec, &event->pointer->base, dx, dy, dx, dy);
+	/* Rebase at output edges so an offset cannot make part of the layout unreachable. */
+	absolute_offset_x = cursor->x - absolute_x;
+	absolute_offset_y = cursor->y - absolute_y;
 }
 
 void
@@ -2629,6 +2641,7 @@ motionrelative(struct wl_listener *listener, void *data)
 	/* This event is forwarded by the cursor when a pointer emits a _relative_
 	 * pointer motion event (i.e. a delta) */
 	struct wlr_pointer_motion_event *event = data;
+	absolute_pointer = NULL;
 	/* The cursor doesn't move unless we tell it to. The cursor automatically
 	 * handles constraining the motion to the output layout, as well as any
 	 * special configuration applied for the specific input device which
@@ -2656,8 +2669,15 @@ moveresize(const Arg *arg)
 		wlr_cursor_set_xcursor(cursor, cursor_mgr, "all-scroll");
 		break;
 	case CurResize:
-		/* Keep the pointer in place: absolute input (e.g. Lan Mouse) cannot
-		 * follow a compositor-side warp. Resize by the drag delta instead. */
+		wlr_cursor_warp_closest(cursor, NULL,
+				grabc->geom.x + grabc->geom.width,
+				grabc->geom.y + grabc->geom.height);
+		/* Keep absolute input aligned with the warped cursor, including after
+		 * the grab ends, until another input device takes over. */
+		if (absolute_pointer) {
+			absolute_offset_x = cursor->x - absolute_x;
+			absolute_offset_y = cursor->y - absolute_y;
+		}
 		grabcx = (int)round(cursor->x) - grabc->geom.width;
 		grabcy = (int)round(cursor->y) - grabc->geom.height;
 		wlr_cursor_set_xcursor(cursor, cursor_mgr, "se-resize");
@@ -3016,7 +3036,7 @@ setfloating(Client *c, int floating)
 			(p && p->isfullscreen) ? LyrFS
 			: c->isfloating ? LyrFloat : LyrTile]);
 	if (c->isfloating && !c->bw)
-		resize(c, c->mon->m, 0, 1);
+		resize(c, c->geom, 0, 1);
 	arrange(c->mon);
 	printstatus();
 }

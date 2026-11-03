@@ -52,6 +52,7 @@ static const Rule rules[] = {
 	{ "qgroundcontrol",       "QGroundControl",       1 << 3,       0,           -1 },
 	{ "qtpass",               NULL,                   0,            1,           -1 },
 	{ "rhythmbox",            NULL,                   0,            1,           -1 },
+	{ "Rhythmbox",            NULL,                   0,            1,           -1 },
 	{ "signal",               NULL,                   1 << 2,       0,           -1 },
 	{ "element",              NULL,                   1 << 2,       0,           -1 },
 	{ "spotify",              NULL,                   1 << 4,       1,           -1 },

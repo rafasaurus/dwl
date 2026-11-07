@@ -129,6 +129,11 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 static const char *termcmd[] = { "foot", NULL };
 static const char *menucmd[] = { "wmenu-run", NULL };
 
+static const char *lockedsuspend[] = { "systemctl", "suspend", NULL };
+static const Key lockedkeys[] = {
+	{ 0,                    XKB_KEY_XF86PowerOff,           spawn,              {.v = lockedsuspend} },
+};
+
 static const Key keys[] = {
 	/* modifier                  key                 function        argument */
 	{ MODKEY,                    XKB_KEY_p,          spawn,          {.v = menucmd} },

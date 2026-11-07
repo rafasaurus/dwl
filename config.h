@@ -183,6 +183,11 @@ static const char *ignorewindows[] = { "wmbubble", NULL };
 #define SHIFT WLR_MODIFIER_SHIFT
 #define LOGO WLR_MODIFIER_LOGO
 #define CTRL WLR_MODIFIER_CTRL
+static const char *lockedsuspend[] = { "systemctl", "suspend", NULL };
+static const Key lockedkeys[] = {
+	{ 0,                    XKB_KEY_XF86PowerOff,           spawn,              {.v = lockedsuspend} },
+};
+
 static const Key keys[] = {
     /* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */
     /* modifier                  key                 function        argument */

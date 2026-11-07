@@ -2275,6 +2275,18 @@ keypress(struct wl_listener *listener, void *data)
 	else
 		wl_event_source_timer_update(group->key_repeat_source, 0);
 
+	if (locked && event->state == WL_KEYBOARD_KEY_STATE_PRESSED) {
+		const Key *k;
+		for (k = lockedkeys; k < END(lockedkeys); k++) {
+			if (CLEANMASK(group->mods) == CLEANMASK(k->mod) && k->func
+					&& (group->keysyms[0] == k->keysym || group->keysyms[1] == k->keysym)) {
+				consumed[event->keycode] = 1;
+				k->func(&k->arg);
+				return;
+			}
+		}
+	}
+
 	if (handled || input_method_keyboard_grab_forward_key(group, event))
 		return;
 

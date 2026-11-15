@@ -272,7 +272,7 @@ static const Axis axes[] = {
 };
 
 static const Button buttons[] = {
-	{ MODKEY, BTN_LEFT,   moveresize,     {.ui = CurMove} },
+	{ MODKEY|CTRL, BTN_LEFT,   moveresize,     {.ui = CurMove} },
 	{ MODKEY, BTN_MIDDLE, togglefloating, {0} },
 	{ MODKEY|SHIFT, BTN_LEFT,  moveresize,     {.ui = CurResize} },
 };

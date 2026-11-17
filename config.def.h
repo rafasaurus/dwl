@@ -14,6 +14,7 @@ static const unsigned int gappiv           = 10; /* vert inner gap between windo
 static const unsigned int gappoh           = 10; /* horiz outer gap between windows and screen edge */
 static const unsigned int gappov           = 10; /* vert outer gap between windows and screen edge */
 static const unsigned int snap             = 32; /* snap pixel */
+static const unsigned int dragthreshold    = 8;  /* drag pixels before a tiled window floats */
 static const float rootcolor[]             = COLOR(0x222222ff);
 static const float bordercolor[]           = COLOR(0x444444ff);
 static const float focuscolor[]            = COLOR(0x005577ff);

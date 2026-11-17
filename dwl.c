@@ -2609,6 +2609,12 @@ motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double d
 		/* Move the grabbed client to the new position. */
 		nx = (int)round(cursor->x) - grabcx;
 		ny = (int)round(cursor->y) - grabcy;
+		if (!grabc->isfloating) {
+			if (abs(nx - grabc->geom.x) < (int)dragthreshold
+					&& abs(ny - grabc->geom.y) < (int)dragthreshold)
+				return;
+			setfloating(grabc, 1);
+		}
 		if (abs(selmon->w.x - nx) < (int)snap)
 			nx = selmon->w.x;
 		else if (abs((selmon->w.x + selmon->w.width) - (nx + grabc->geom.width)) < (int)snap)
@@ -2659,8 +2665,7 @@ moveresize(const Arg *arg)
 	if (!grabc || client_is_unmanaged(grabc) || grabc->isfullscreen)
 		return;
 
-	/* Float the window and tell motionnotify to grab it */
-	setfloating(grabc, 1);
+	/* Tell motionnotify to grab the window */
 	switch (cursor_mode = arg->ui) {
 	case CurMove:
 		grabcx = (int)round(cursor->x) - grabc->geom.x;
@@ -2668,6 +2673,7 @@ moveresize(const Arg *arg)
 		wlr_cursor_set_xcursor(cursor, cursor_mgr, "all-scroll");
 		break;
 	case CurResize:
+		setfloating(grabc, 1);
 		/* Doesn't work for X11 output - the next absolute motion event
 		 * returns the cursor to where it started */
 		wlr_cursor_warp_closest(cursor, NULL,

@@ -2385,6 +2385,7 @@ locksession(struct wl_listener *listener, void *data)
 	lock->scene = wlr_scene_tree_create(layers[LyrBlock]);
 	cur_lock = lock->lock = session_lock;
 	locked = 1;
+	setxkbrules(&(const Arg){.i = 0});
 
 	LISTEN(&session_lock->events.new_surface, &lock->new_surface, createlocksurface);
 	LISTEN(&session_lock->events.destroy, &lock->destroy, destroysessionlock);
